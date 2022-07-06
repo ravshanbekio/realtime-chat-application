@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
+from user.authentication import TestAuthentication
 
 from user.forms import RegisterUserForm
 
@@ -14,10 +15,10 @@ class RegisterView(View):
     def post(self, request):
         form = RegisterUserForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
             password = form.cleaned_data['password1']
             form.save()
-            user = authenticate(request, username=username, password=password)
+            user = TestAuthentication.authenticate(request, email=email, password=password)
             login(request, user)
             return redirect('dashboard')
         else:
@@ -31,9 +32,9 @@ class LoginView(View):
             return render(request, 'login.html')
 
     def post(self, request):
-        username = request.POST['username']
+        email = request.POST['email']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
+        user = TestAuthentication.authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
             return redirect('dashboard')
